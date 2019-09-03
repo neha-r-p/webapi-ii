@@ -8,8 +8,6 @@ const db = require("./data/db");
 // find, findById, insert,update,remove,findPostComments,findCommentById,insertComment
 
 
-
-//handle HTTP GET requests to the / URL
 server.get("/api/posts", (req, res) => {
     db.find()
     .then(db => {
@@ -21,6 +19,34 @@ server.get("/api/posts", (req, res) => {
       res.status(500).json({ message: "error getting the list of posts" });
     });
 });
+
+server.post('/api/posts', (req, res) => {
+    const postInfo = req.body;
+    console.log('post info from body', postInfo)
+
+    db.insert(postInfo)
+    .then()
+    .catch(err => {
+        res.status(500).json({ message: "error adding the blog post" })
+    })
+})
+
+
+/*//create a Hub
+server.post("/hubs", (req, res) => {
+  // http message is an object with headers and body like { headers: {}, body: {//data sent by client} }
+  const hubInformation = req.body;
+  console.log("hub info from body", hubInformation);
+
+  Hubs.add(hubInformation)
+    .then(hub => {
+      res.status(201).json(hub);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "error adding the hub" });
+    });
+}); */
+
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
