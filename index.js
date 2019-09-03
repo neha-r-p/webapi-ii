@@ -33,21 +33,9 @@ server.post('/api/posts', (req, res) => {
     })
 })
 
-
-/*//create a Hub
-server.post("/hubs", (req, res) => {
-  // http message is an object with headers and body like { headers: {}, body: {//data sent by client} }
-  const hubInformation = req.body;
-  console.log("hub info from body", hubInformation);
-
-  Hubs.add(hubInformation)
-    .then(hub => {
-      res.status(201).json(hub);
-    })
-    .catch(err => {
-      res.status(500).json({ message: "error adding the hub" });
-    });
-}); */
+server.delete('api/posts/:id', (req, res) => {
+    
+})
 
 
 const port = 6666;
