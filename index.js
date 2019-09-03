@@ -33,18 +33,16 @@ server.get("/api/posts/:id", (req, res) => {
 });
 
 server.get("/api/posts/:id/comments", (req, res) => {
-    const postId = req.params.id
+  const postId = req.params.id;
 
-    Posts.findPostComments(postId)
+  Posts.findPostComments(postId)
     .then(comments => {
-        res.status(200).json(comments)
-    }
-
-    )
-    .catch(err => {
-        res.status(500).json({ message: "Comments for blog post not found" })
+      res.status(200).json(comments);
     })
-})
+    .catch(err => {
+      res.status(500).json({ message: "Comments for blog post not found" });
+    });
+});
 
 server.post("/api/posts", (req, res) => {
   const postInfo = req.body;
@@ -52,8 +50,10 @@ server.post("/api/posts", (req, res) => {
 
   Posts.insert(postInfo)
     .then(post => {
-      res.status(201).json(post);
-    })
+      if(postInfo.title && postInfo.contents){res.status(201).json(post);
+    } else {
+        res.status(400).json({ message: "Please provide title and contents for the post." })
+    }})
     .catch(err => {
       res.status(500).json({ message: "error adding the blog post" });
     });
