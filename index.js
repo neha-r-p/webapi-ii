@@ -32,6 +32,20 @@ server.get("/api/posts/:id", (req, res) => {
     });
 });
 
+server.get("/api/posts/:id/comments", (req, res) => {
+    const postId = req.params.id
+
+    Posts.findPostComments(postId)
+    .then(comments => {
+        res.status(200).json(comments)
+    }
+
+    )
+    .catch(err => {
+        res.status(500).json({ message: "Comments for blog post not found" })
+    })
+})
+
 server.post("/api/posts", (req, res) => {
   const postInfo = req.body;
   console.log("post info from body", postInfo);
