@@ -7,9 +7,8 @@ server.use(express.json());
 const db = require("./data/db");
 // find, findById, insert,update,remove,findPostComments,findCommentById,insertComment
 
-
 server.get("/api/posts", (req, res) => {
-    db.find()
+  db.find()
     .then(db => {
       // .json will convert (or try) the data passed to JSON before sending
       // also tells the client we're sending JSON through an HTTP header
@@ -20,23 +19,31 @@ server.get("/api/posts", (req, res) => {
     });
 });
 
-server.post('/api/posts', (req, res) => {
-    const postInfo = req.body;
-    console.log('post info from body', postInfo)
+server.post("/api/posts", (req, res) => {
+  const postInfo = req.body;
+  console.log("post info from body", postInfo);
 
-    db.insert(postInfo)
+  db.insert(postInfo)
     .then(post => {
-        res.status(201).json(post)
+      res.status(201).json(post);
     })
     .catch(err => {
-        res.status(500).json({ message: "error adding the blog post" })
+      res.status(500).json({ message: "error adding the blog post" });
+    });
+});
+
+server.delete("api/posts/:id", (req, res) => {
+  const postId = req.params.id;
+
+  db.remove(postId)
+    .then(post => {
+        res.status(200).json({ message: "blog post deleted successfully" })
     })
-})
-
-server.delete('api/posts/:id', (req, res) => {
-    
-})
-
+    .catch(error => {
+      res.status(500).json({ message: "error removing blog post" });
+    });
+  
+});
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
