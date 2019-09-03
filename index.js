@@ -13,7 +13,22 @@ server.get("/api/posts", (req, res) => {
       res.status(200).json(posts);
     })
     .catch(err => {
-      res.status(500).json({ message: "error getting the list of posts" });
+      res.status(500).json({ message: "Error getting the blog posts" });
+    });
+});
+
+server.get("/api/posts/:id", (req, res) => {
+  const postId = req.params.id;
+  Posts.findById(postId)
+    .then(p => {
+      if (p) {
+        res.status(200).json(p);
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error getting the blog post" });
     });
 });
 
@@ -31,7 +46,7 @@ server.post("/api/posts", (req, res) => {
 });
 
 server.delete("/api/posts/:id", (req, res) => {
-    const postId = req.params.id;
+  const postId = req.params.id;
 
   Posts.remove(postId)
     .then(post => {
