@@ -25,7 +25,9 @@ server.post('/api/posts', (req, res) => {
     console.log('post info from body', postInfo)
 
     db.insert(postInfo)
-    .then()
+    .then(post => {
+        res.status(201).json(post)
+    })
     .catch(err => {
         res.status(500).json({ message: "error adding the blog post" })
     })
