@@ -33,9 +33,22 @@ server.post("/api/posts", (req, res) => {
 server.delete("api/posts/:id", (req, res) => {
   const postId = req.params.id;
 
+  Posts.remove(postId)
+  .then(delPost => {
+      if(delPost){
+
+      } else {
+        res.status(404).json({ message: 'The post could not be found' });
+      }
+  })
+  .catch(err => {
+      console.log(err)
+      res.status(500).json({ message: "Error deleting blog post" })
+  })
+
   res.status(200).json({
     url: `api/posts/${postId}`,
-    opeation: `DELETE for hobbit with id ${postId}`,
+    opeation: `DELETE for post with id ${postId}`,
   });
   
 });
