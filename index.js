@@ -4,15 +4,13 @@ const server = express();
 //teach server to parse json
 server.use(express.json());
 
-const db = require("./data/db");
+const Posts = require("./data/db");
 // find, findById, insert,update,remove,findPostComments,findCommentById,insertComment
 
 server.get("/api/posts", (req, res) => {
-  db.find()
-    .then(db => {
-      // .json will convert (or try) the data passed to JSON before sending
-      // also tells the client we're sending JSON through an HTTP header
-      res.status(200).json(db);
+ Posts.find()
+    .then(posts => {
+      res.status(200).json(posts);
     })
     .catch(err => {
       res.status(500).json({ message: "error getting the list of posts" });
@@ -23,7 +21,7 @@ server.post("/api/posts", (req, res) => {
   const postInfo = req.body;
   console.log("post info from body", postInfo);
 
-  db.insert(postInfo)
+ Posts.insert(postInfo)
     .then(post => {
       res.status(201).json(post);
     })
@@ -35,13 +33,10 @@ server.post("/api/posts", (req, res) => {
 server.delete("api/posts/:id", (req, res) => {
   const postId = req.params.id;
 
-  db.remove(postId)
-    .then(post => {
-        res.status(200).json({ message: "blog post deleted successfully" })
-    })
-    .catch(error => {
-      res.status(500).json({ message: "error removing blog post" });
-    });
+  res.status(200).json({
+    url: `api/posts/${postId}`,
+    opeation: `DELETE for hobbit with id ${postId}`,
+  });
   
 });
 
