@@ -7,6 +7,7 @@ server.use(express.json());
 const Posts = require("./data/db");
 // find, findById, insert,update,remove,findPostComments,findCommentById,insertComment
 
+//get all posts
 server.get("/api/posts", (req, res) => {
   Posts.find()
     .then(posts => {
@@ -19,6 +20,7 @@ server.get("/api/posts", (req, res) => {
     });
 });
 
+//get posts by ID
 server.get("/api/posts/:id", (req, res) => {
   const postId = req.params.id;
   Posts.findById(postId)
@@ -34,6 +36,7 @@ server.get("/api/posts/:id", (req, res) => {
     });
 });
 
+//get comments on specific post using id
 server.get("/api/posts/:id/comments", (req, res) => {
   const postId = req.params.id;
 
@@ -46,6 +49,7 @@ server.get("/api/posts/:id/comments", (req, res) => {
     });
 });
 
+//post new blog post
 server.post(`/api/posts`, (req, res) => {
   const { title, contents } = req.body;
 
@@ -76,6 +80,8 @@ server.post(`/api/posts`, (req, res) => {
   }
 });
 
+
+//post new comment (NOT COMPLETE)
 server.post("api/posts/:id/comments", (req, res) => {
   const postInfo = req.body;
   const postId = req.params.id;
@@ -96,6 +102,7 @@ server.post("api/posts/:id/comments", (req, res) => {
     });
 });
 
+//Delete a post by using id
 server.delete("/api/posts/:id", (req, res) => {
   const postId = req.params.id;
 
@@ -103,13 +110,15 @@ server.delete("/api/posts/:id", (req, res) => {
     .then(post => {
       res
         .status(200)
-        .json({ message: "The post with the specified ID does not exist." });
+        .json({ message: "Successfully deleted the blog post." });
     })
     .catch(err => {
       console.log(err);
       res.status(500).json({ message: "The post could not be removed." });
     });
 });
+
+// update a post with PUT request
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
