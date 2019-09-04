@@ -28,11 +28,15 @@ server.get("/api/posts/:id", (req, res) => {
       if (p) {
         res.status(200).json(p);
       } else {
-        res.status(404).json({ message: "Post not found" });
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Error getting the blog post" });
+      res
+        .status(500)
+        .json({ error: "The post information could not be retrieved." });
     });
 });
 
@@ -83,26 +87,24 @@ server.post(`/api/posts`, (req, res) => {
 //post new comment (NOT COMPLETE)
 server.post("/api/posts/:id/comments", (req, res) => {
   const postInfo = req.body;
-  const { id } = req.params;
-  console.log("post info from body", postInfo);
+  const post_id = req.params.id;
+  console.log("post info from body", postInfo, post_id);
 
-  Posts.insertComment(id, postInfo)
+  Posts.insertComment(postInfo)
     .then(comment => {
       if (postInfo.text) {
         res.status(201).json(comment);
       } else {
         res
           .status(400)
-          .json({ message: "Please provide title and contents for the post." });
+          .json({ errorMessage: "Please provide text for the comment." });
       }
     })
     .catch(err => {
       console.log("comment post", err);
-      res
-        .status(500)
-        .json({
-          error: "There was an error while saving the comment to the database"
-        });
+      res.status(500).json({
+        error: "There was an error while saving the comment to the database"
+      });
     });
 });
 
@@ -142,42 +144,17 @@ server.put("/api/posts/:id", (req, res) => {
       } else if (postInfo.title && postInfo.contents) {
         res.status(200).json(dat);
       } else {
-        res
-          .status(400)
-          .json({
-            errorMessage: "Please provide title and contents for the post."
-          });
+        res.status(400).json({
+          errorMessage: "Please provide title and contents for the post."
+        });
       }
     })
     .catch(error => {
-      res
-        .status(500)
-        .json({
-          error: "There was an error while saving the post to the database"
-        });
+      res.status(500).json({
+        error: "There was an error while saving the post to the database"
+      });
     });
 });
-
-// server.put("/api/posts/:id", (req, res) => {
-//   const { id } = req.params;
-//   const changes = req.body;
-
-//   Posts.update(id, changes)
-//     .then(updated => {
-//       if (updated) {
-//         res.status(200).json(updated);
-//       } else {
-//         res
-//           .status(404)
-//           .json({ message: "The post with the specified ID does not exist." });
-//       }
-//     })
-//     .catch(err => {
-//       res
-//         .status(500)
-//         .json({ message: "The post information could not be modified." });
-//     });
-// });
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
