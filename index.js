@@ -130,28 +130,13 @@ server.put('/api/posts/:id', (req, res) => {
             res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
     })
-    .catch()
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: "The post information could not be modified." })
+    })
 })
 
 
-// server.put('/api/hubs/:id', (req, res) => {
-//     const changes = req.body;
-//     Hubs.update(req.params.id, changes)
-//     .then(hub => {
-//       if (hub) {
-//         res.status(200).json(hub);
-//       } else {
-//         res.status(404).json({ message: 'The hub could not be found' });
-//       }
-//     })
-//     .catch(error => {
-//       // log error to database
-//       console.log(error);
-//       res.status(500).json({
-//         message: 'Error updating the hub',
-//       });
-//     });
-//   });
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
