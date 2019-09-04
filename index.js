@@ -112,7 +112,9 @@ server.delete("/api/posts/:id", (req, res) => {
           .status(200)
           .json({ message: "Successfully deleted the blog post." });
       } else {
-        res.status(404).json({ message: "The post with the specified ID does not exist." });
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
       }
     })
     .catch(err => {
@@ -122,37 +124,26 @@ server.delete("/api/posts/:id", (req, res) => {
 });
 
 // update a post with PUT request
-server.put("/api/posts/:id", (req, res) => {
-  const { title, contents } = req.body;
-  const { id } = req.params;
 
-  if (title && contents) {
-    Posts.update(id, { title, contents })
-      .then(({ id }) => {
-        Posts.findById(id)
-          .then(post => {
-            res.status(201).json(post[0]); // return HTTP status code 201 & updated post
-          })
-          .catch(err => {
-            console.log(err);
-            res
-              .status(404)
-              .json({
-                message: "The post with the specified ID does not exist."
-              });
-          });
-      })
-      .catch(err => {
-        console.log(err);
+server.put("/api/posts/:id", (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+
+  Posts.update(id, changes)
+    .then(updated => {
+      if (updated) {
+        res.status(200).json(updated);
+      } else {
         res
-          .status(500)
-          .json({ error: "The post information could not be modified." });
-      });
-  } else {
-    res
-      .status(400)
-      .json({ error: "Please provide title and contents for the post." });
-  }
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ message: "The post information could not be modified." });
+    });
 });
 
 const port = 6666;
