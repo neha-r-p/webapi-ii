@@ -80,7 +80,6 @@ server.post(`/api/posts`, (req, res) => {
   }
 });
 
-
 //post new comment (NOT COMPLETE)
 server.post("api/posts/:id/comments", (req, res) => {
   const postInfo = req.body;
@@ -108,9 +107,13 @@ server.delete("/api/posts/:id", (req, res) => {
 
   Posts.remove(postId)
     .then(post => {
-      res
-        .status(200)
-        .json({ message: "Successfully deleted the blog post." });
+      if (post) {
+        res
+          .status(200)
+          .json({ message: "Successfully deleted the blog post." });
+      } else {
+        res.status(404).json({ message: "The post with the specified ID does not exist." });
+      }
     })
     .catch(err => {
       console.log(err);
@@ -119,24 +122,38 @@ server.delete("/api/posts/:id", (req, res) => {
 });
 
 // update a post with PUT request
-server.put('/api/posts/:id', (req, res) => {
-    const changes = req.body;
-    const postId = req.params.id;
-    Posts.update(postId, changes)
-    .then(post => {
-        if (post) {
-            res.status(200).json(post);
-        } else {
-            res.status(404).json({ message: "The post with the specified ID does not exist." })
-        }
-    })
-    .catch(err => {
+server.put("/api/posts/:id", (req, res) => {
+  const { title, contents } = req.body;
+  const { id } = req.params;
+
+  if (title && contents) {
+    Posts.update(id, { title, contents })
+      .then(({ id }) => {
+        Posts.findById(id)
+          .then(post => {
+            res.status(201).json(post[0]); // return HTTP status code 201 & updated post
+          })
+          .catch(err => {
+            console.log(err);
+            res
+              .status(404)
+              .json({
+                message: "The post with the specified ID does not exist."
+              });
+          });
+      })
+      .catch(err => {
         console.log(err);
-        res.status(500).json({ error: "The post information could not be modified." })
-    })
-})
-
-
+        res
+          .status(500)
+          .json({ error: "The post information could not be modified." });
+      });
+  } else {
+    res
+      .status(400)
+      .json({ error: "Please provide title and contents for the post." });
+  }
+});
 
 const port = 6666;
 server.listen(port, () => console.log(`\napi running on port ${port}\n`));
