@@ -13,7 +13,9 @@ server.get("/api/posts", (req, res) => {
       res.status(200).json(posts);
     })
     .catch(err => {
-      res.status(500).json({ message: "Error getting the blog posts" });
+      res
+        .status(500)
+        .json({ message: "The posts information could not be retrieved." });
     });
 });
 
@@ -44,16 +46,51 @@ server.get("/api/posts/:id/comments", (req, res) => {
     });
 });
 
-server.post("/api/posts", (req, res) => {
+server.post(`/api/posts`, (req, res) => {
+  const { title, contents } = req.body;
+
+  if (title && contents) {
+    Posts.insert({ title, contents })
+      .then(({ id }) => {
+        Posts.findById(id)
+          .then(post => {
+            res.status(201).json(post[0]); // return HTTP status code 201 & newly created post
+          })
+          .catch(err => {
+            console.log(err);
+            res
+              .status(500)
+              .json({ error: "There was a server error retrieving the post" });
+          });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: "There was an error while saving the post to the database"
+        });
+      });
+  } else {
+    res
+      .status(400)
+      .json({ error: "Please provide title and contents for the post." });
+  }
+});
+
+server.post("api/posts/:id/comments", (req, res) => {
   const postInfo = req.body;
+  const postId = req.params.id;
   console.log("post info from body", postInfo);
 
-  Posts.insert(postInfo)
-    .then(post => {
-      if(postInfo.title && postInfo.contents){res.status(201).json(post);
-    } else {
-        res.status(400).json({ message: "Please provide title and contents for the post." })
-    }})
+  Posts.insertComment(postInfo)
+    .then(comment => {
+      if (postInfo.text) {
+        res.status(201).json(postInfo);
+      } else {
+        res
+          .status(400)
+          .json({ message: "Please provide title and contents for the post." });
+      }
+    })
     .catch(err => {
       res.status(500).json({ message: "error adding the blog post" });
     });
@@ -64,11 +101,13 @@ server.delete("/api/posts/:id", (req, res) => {
 
   Posts.remove(postId)
     .then(post => {
-      res.status(200).json({ message: "Blog post deleted successfully" });
+      res
+        .status(200)
+        .json({ message: "The post with the specified ID does not exist." });
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({ message: "Error deleting blog post" });
+      res.status(500).json({ message: "The post could not be removed." });
     });
 });
 
